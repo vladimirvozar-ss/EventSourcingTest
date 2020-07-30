@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+
+  eventstore:
+    container_name: esskipass-eventstore
+    image: eventstore/eventstore
+    command: --dev --enable-external-tcp --ext-ip=0.0.0.0 --int-ip=0.0.0.0 --disable-external-tcp-tls
+    environment:
+      - EVENTSTORE_CLUSTER_SIZE=1
+      - EVENTSTORE_INT_TCP_PORT=1112
+      - EVENTSTORE_EXT_TCP_PORT=1113
+      - EVENTSTORE_INT_HTTP_PORT=2112
+      - EVENTSTORE_EXT_HTTP_PORT=2113
+      - EVENTSTORE_DEV=true
+    ports:
+      - "1112:1112"
+      - "1113:1113"
+      - "2112:2112"
+      - "2113:2113"
+
+  eventsourcingtest:
+    image: ${DOCKER_REGISTRY-}eventsourcingtest
+    build:
+      context: .
+      dockerfile: EventSourcingTest/Dockerfile
+    depends_on:
+      - eventstore
